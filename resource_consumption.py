@@ -4,7 +4,7 @@ import numpy as np
 
 def draw_resource_consumption_plot(
     x_labels, y_stage_1, y_stage_2, y_stage_3, y_stage_4, y_stage_5, y_stage_6, filename,
-    x_tick_rotation=45):
+    x_tick_rotation=45, title='Title'):
 
     """
     Example input:
@@ -63,7 +63,7 @@ def draw_resource_consumption_plot(
     x = np.arange(len(x_labels))  # the label locations
     width = 0.4  # the width of the bars
 
-    fig, ax = plt.subplots(1, 1, figsize=(8, 2))
+    fig, ax = plt.subplots(1, 1, figsize=(6, 1.6))
 
 
     bottom_stage_1 = np.zeros(len(y_stage_1))
@@ -85,8 +85,8 @@ def draw_resource_consumption_plot(
     label_font = 10
     tick_font = 10
     tick_label_font = 9
-    legend_font = 8
-    title_font = 14
+    legend_font = 9
+    title_font = 11
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel('Resource Consumption (%)', fontsize=label_font)
@@ -97,8 +97,8 @@ def draw_resource_consumption_plot(
 
     ax.legend([rects_stage1, rects_stage2, rects_stage3, rects_stage4, rects_stage5, rects_stage6], 
         ["Stage 1: OPQ", "Stage 2: vector quantizer", "Stage 3: select centroids", \
-        "Stage 4: construct distance LUT", "Stage 5: scan PQ codes", "Stage 6: collect topK results"], loc=(0.0, 1.05), ncol=3, \
-      facecolor='white', framealpha=1, frameon=False, fontsize=legend_font)
+        "Stage 4: construct distance LUT", "Stage 5: scan PQ codes", "Stage 6: collect topK results"], loc=(0.0, 1.05), ncol=2, \
+        facecolor='white', framealpha=1, frameon=False, fontsize=legend_font)
 
 
     def number_single_bar(rects, bottom, annotate_threshold=20):
@@ -120,6 +120,7 @@ def draw_resource_consumption_plot(
     number_single_bar(rects_stage5, bottom_stage_5, annotate_threshold=20)
     number_single_bar(rects_stage6, bottom_stage_6, annotate_threshold=20)
 
+    ax.set_title(title, fontsize=title_font, y=1.45)
 
     ax.set(ylim=[0, 100])
     plt.xticks(rotation=x_tick_rotation)

@@ -4,8 +4,8 @@ import numpy as np
 
 from resource_consumption import draw_resource_consumption_plot
 
-x_labels = ['topK=1', 'topK=10', 'topK=20', 'topK=50',\
-    'topK=100', 'topK=200', 'topK=500', 'topK=1000']
+x_labels = ['K=1', 'K=10', 'K=20', 'K=50',\
+    'K=100', 'K=200', 'K=500', 'K=1000']
 
 # Stage 1: OPQ
 # Stage 2: vector quantizer
@@ -40,5 +40,5 @@ y_stage_5 = [r[4] for r in resource_utilization_cases]
 y_stage_6 = [r[5] for r in resource_utilization_cases]
 
 draw_resource_consumption_plot(x_labels, y_stage_1, y_stage_2, y_stage_3, y_stage_4, y_stage_5, y_stage_6, 
-    'resource_consumption_experiment_5_topK', x_tick_rotation=0)
+    'resource_consumption_experiment_5_topK', x_tick_rotation=0, title="FPGA,SIFT100M,OPQ+IVF8192")
 

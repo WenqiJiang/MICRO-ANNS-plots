@@ -39,5 +39,6 @@ y_stage_5 = [r[4] for r in resource_utilization_cases]
 y_stage_6 = [r[5] for r in resource_utilization_cases]
 
 draw_resource_consumption_plot(x_labels, y_stage_1, y_stage_2, y_stage_3, y_stage_4, y_stage_5, y_stage_6, 
-    'resource_consumption_experiment_3_nlist', x_tick_rotation=0)
+    'resource_consumption_experiment_3_nlist', 
+    x_tick_rotation=30, title="FPGA,SIFT100M,nprobe=16")
 
