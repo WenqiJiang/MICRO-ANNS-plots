@@ -215,7 +215,7 @@ ax.set_xticklabels(x_labels)
 plt.xticks(rotation=0)
 
 
-legend_list = ["CPU (16-core Xeon)", "FPGA baseline (U280)", "FPGA autoGen (U280)", "GPU (V100)"]
+legend_list = ["CPU (16-core Xeon)", "FPGA Data-independent (U280)", "FPGA Data-dependent (U280)", "GPU (V100)"]
 ax.legend([rects_cpu, rects_fpga, rects_fpga_optimized, rects_gpu], legend_list, facecolor='white', framealpha=1, frameon=False, loc=(args.legend_loc_x, 0.7), fontsize=legend_font, ncol=2)
 
 # ax.set_title('{} R@{}={}: {:.2f}x over CPU, {:.2f}x over GPU'.format(

@@ -2,9 +2,9 @@
 #   python CPU_GPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result_m4.4xlarge/cpu_throughput_SIFT100M.pkl' --gpu_performance_dict_dir '../gpu_performance_result_V100_32GB/gpu_throughput_SIFT100M.pkl' --fpga_baseline_performance_dict_dir '../fpga_performance_result/FPGA_perf_dict_SIFT100M.pkl' --dbname SIFT100M --topK 100 --recall_goal 0.95
 
 # Full command list
-#   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m4.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_1.pkl' --dbname SIFT100M --topK 1 --recall_goal 0.3 --legend_loc_x 0.6
-#   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m4.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_10.pkl' --dbname SIFT100M --topK 10 --recall_goal 0.8 --legend_loc_x 0.6
-#   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m4.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_100.pkl' --dbname SIFT100M --topK 100 --recall_goal 0.95 --legend_loc_x 0.6
+#   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m4.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_1.pkl' --dbname SIFT100M --topK 1 --recall_goal 0.3 --legend_loc_x 0.45
+#   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m4.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_10.pkl' --dbname SIFT100M --topK 10 --recall_goal 0.8 --legend_loc_x 0.45
+#   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m4.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_100.pkl' --dbname SIFT100M --topK 100 --recall_goal 0.95 --legend_loc_x 0.45
 
 # Run with python 3.9 if the following error occurs
 # WenqideMacBook-Pro@~/Works/ANNS-FPGA/python_figures wenqi$python CPU_GPU_FPGA_throughput_from_dict.py 
@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 
-plt.style.use('ggplot')
+plt.style.use('grayscale')
 
 import argparse 
 parser = argparse.ArgumentParser()
@@ -156,28 +156,28 @@ rects_fpga = ax.bar(x + width / 2, y_fpga, width)#, label='Women')
 optimized_FPGA_throughput = None
 if args.dbname == 'SIFT100M' and args.topK == 1 and args.recall_goal == 0.25:
     optimized_FPGA_throughput = 31033
-    ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA AutoGen', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
-    ax.text(0, optimized_FPGA_throughput * 0.95, str(optimized_FPGA_throughput), fontsize=10, horizontalalignment='left', verticalalignment='top')
+    ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA Data-dependent', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
+    ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'IVF1024'), fontsize=10, horizontalalignment='left', verticalalignment='top')
     ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='#6C8EBF')
 if args.dbname == 'SIFT100M' and args.topK == 1 and args.recall_goal == 0.3:
     optimized_FPGA_throughput = 27709 # 126 MHz
-    ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA AutoGen', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
-    ax.text(0, optimized_FPGA_throughput * 0.95, str(optimized_FPGA_throughput), fontsize=10, horizontalalignment='left', verticalalignment='top')
+    ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA Data-dependent', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
+    ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'IVF4096'), fontsize=10, horizontalalignment='left', verticalalignment='top')
     ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='#6C8EBF')
 elif args.dbname == 'SIFT100M' and args.topK == 10 and args.recall_goal == 0.6:
     optimized_FPGA_throughput = 30965
-    ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA AutoGen', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
-    ax.text(0, optimized_FPGA_throughput * 0.95, str(optimized_FPGA_throughput), fontsize=10, horizontalalignment='left', verticalalignment='top')
+    ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA Data-dependent', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
+    ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'IVF4096'), fontsize=10, horizontalalignment='left', verticalalignment='top')
     ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='#6C8EBF')
 elif args.dbname == 'SIFT100M' and args.topK == 10 and args.recall_goal == 0.8:
     optimized_FPGA_throughput = 11035
-    ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA AutoGen', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
-    ax.text(0, optimized_FPGA_throughput * 0.95, str(optimized_FPGA_throughput), fontsize=10, horizontalalignment='left', verticalalignment='top')
+    ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA Data-dependent', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
+    ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'OPQ16,IVF8192'), fontsize=10, horizontalalignment='left', verticalalignment='top')
     ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='#6C8EBF')
 elif args.dbname == 'SIFT100M' and args.topK == 100 and args.recall_goal == 0.95:
     optimized_FPGA_throughput = 3519
-    ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA AutoGen', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
-    ax.text(0, optimized_FPGA_throughput * 0.95, str(optimized_FPGA_throughput), fontsize=10, horizontalalignment='left', verticalalignment='top')
+    ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA Data-dependent', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
+    ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'OPQ16,IVF16384'), fontsize=10, horizontalalignment='left', verticalalignment='top')
     ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='#6C8EBF')
 
 best_qps_cpu = np.amax(y_cpu)
@@ -198,7 +198,8 @@ ax.set_xticklabels(x_labels, fontsize=tick_label_font)
 plt.xticks(rotation=60)
 
 
-legend_list = ["CPU (16-core Xeon)", "FPGA naive (U280)"]
+
+legend_list = ["CPU (16-core Xeon)", "FPGA Data-independent (U280)"]
 # legend_list = ["CPU (16-core Xeon)", "FPGA baseline (U280)"]
 ax.legend([rects_cpu, rects_fpga], legend_list, facecolor='white', framealpha=1, frameon=False, loc=(args.legend_loc_x, 0.7), fontsize=legend_font, ncol=1)
 
@@ -225,8 +226,14 @@ best_qps = np.amax([best_qps_fpga, best_qps_cpu])
 if optimized_FPGA_throughput:
     best_qps = np.max([best_qps, optimized_FPGA_throughput])
 ax.set(ylim=[0, best_qps * 1.5])
+ax.text(-1.5, -0.1 * best_qps, 'Index', fontsize=10, horizontalalignment='center', verticalalignment='top')
 
 plt.rcParams.update({'figure.autolayout': True})
+
+for i, y in enumerate(y_cpu):
+    if y == 0:
+        ax.text(i, 0.1, 'cannot reach\nR@{}={}'.format(topK, recall_goal), fontsize=8, horizontalalignment='right', verticalalignment='bottom', rotation=90)
+
 
 plt.savefig('./CPU_FPGA_throughput_comparison_fig/CPU_FPGA_throughput_comparison_{dbname}_R@{topK}={recall}.png'.format(dbname=dbname,topK=topK,recall=int(recall_goal*100)), transparent=False, dpi=200, bbox_inches="tight")
 plt.show()

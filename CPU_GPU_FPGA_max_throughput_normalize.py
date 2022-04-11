@@ -13,11 +13,11 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle
-plt.style.use('ggplot')
+plt.style.use('grayscale')
 
 import argparse 
 parser = argparse.ArgumentParser()
-parser.add_argument('--legend_loc_x', type=float, default=0.3, help="the x position of legend, 0~1")
+parser.add_argument('--legend_loc_x', type=float, default=0.5, help="the x position of legend, 0~1")
 
 
 args = parser.parse_args()
@@ -183,9 +183,12 @@ elif recall_goal_R10 == 0.8:
 if recall_goal_R100 == 0.95:
     max_qps_fpga_optimized_R100 = 3519
 
-CPU_FLOPS = 64 * 16 # 64 G per core * 16 core
+CPU_FLOPS = 32 * 16 * 2.3 # broadwell 32 op per cycle per core * 16 core * 2.3 GHz
 GPU_FLOPS = 14 * 1000
-FPGA_FLOPS = 3000 * (200 * 1e6) * 0.6 / 1e9 # 9000 DSP -> 3000 per cycle * 200 MHz * 60\%
+FPGA_FLOPS = 9024 / 5 * 2 * (200 * 1e6) * 0.6 / 1e9 
+# 9024 DSP 
+# 5 DSP per MAC (2 op) 
+# -> 4500 per cycle * 200 MHz * 60\%
 
 y_cpu = np.array([max_qps_cpu_R1, max_qps_cpu_R10, max_qps_cpu_R100]) / CPU_FLOPS
 y_fpga = np.array([max_qps_fpga_R1, max_qps_fpga_R10, max_qps_fpga_R100]) / FPGA_FLOPS
@@ -210,21 +213,21 @@ rects_fpga = ax.bar(x + 0.5 * width, y_fpga, width)#, label='Women')
 rects_fpga_optimized = ax.bar(x + 1.5 * width, y_fpga_optimized, width)#, label='Women')
 
 
-label_font = 12
+label_font = 8
 tick_font = 10
 tick_label_font = 10
 legend_font = 8
 title_font = 11
 
 # Add some text for labels, title and custom x-axis tick labels, etc.
-ax.set_ylabel('QPS Per GFlop/s', fontsize=label_font)
+ax.set_ylabel('QPS Per Peak Gflop/s', fontsize=label_font)
 ax.set_xticks(x)
 ax.set_xticklabels(x_labels)
 plt.xticks(rotation=0)
 
 
-legend_list = ["CPU (16-core Xeon)", "GPU (V100)", "FPGA baseline (U280)", "FPGA autoGen (U280)"]
-ax.legend([rects_cpu, rects_gpu, rects_fpga, rects_fpga_optimized], legend_list, facecolor='white', framealpha=1, frameon=False, loc=(args.legend_loc_x, 0.6), fontsize=legend_font, ncol=2)
+legend_list = ["CPU (16-core Xeon)", "GPU (V100)", "FPGA Data-independent (U280)", "FPGA Data-dependent (U280)"]
+ax.legend([rects_cpu, rects_gpu, rects_fpga, rects_fpga_optimized], legend_list, facecolor='white', framealpha=1, frameon=False, loc=(args.legend_loc_x, 0.4), fontsize=legend_font, ncol=1)
 
 # ax.set_title('{} R@{}={}: {:.2f}x over CPU, {:.2f}x over GPU'.format(
 #     dbname, topK, int(recall_goal*100), best_qps_fpga/best_qps_cpu, best_qps_fpga/best_qps_gpu), 
@@ -242,10 +245,10 @@ def autolabel(rects):
                     ha='center', va='bottom', fontsize=tick_font, horizontalalignment='left', rotation=90)
 
 
-autolabel(rects_cpu)
-autolabel(rects_gpu)
-autolabel(rects_fpga)
-autolabel(rects_fpga_optimized)
+# autolabel(rects_cpu)
+# autolabel(rects_gpu)
+# autolabel(rects_fpga)
+# autolabel(rects_fpga_optimized)
 
 best_qps = np.amax([np.amax(y_gpu), np.amax(y_fpga), np.amax(y_fpga_optimized), np.amax(y_cpu)])
 ax.set(ylim=[0, best_qps * 1.25])

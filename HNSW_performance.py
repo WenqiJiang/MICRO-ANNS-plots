@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib
 
-plt.style.use('ggplot')
+plt.style.use('grayscale')
 
 import numpy as np
 
@@ -20,8 +20,8 @@ x_CPU = np.array([0, 0.2, 0.4, 0.6, 0.8, 1.0]) + 0.4 + x_FPGA[-1]
 
 ########### TODO: Performance of FPGA (2, 4, 8 banks) using ef=128 #############
 ########### TODO: Performance of CPU (1~32 threads) using m4.4xlarge #############
-throughput_FPGA = np.array([0.6, 0.8, 1]) * 1e5 # 2, 4, 8 banks
-throughput_CPU= np.array([0.45, 0.72, 1.25, 1.99, 2.32, 2.3]) * 1e5# 1, 2, 4, 8, 16, 32 threads
+throughput_FPGA = np.array([4483, 6356, 10000])  # 2, 4, 8 banks
+throughput_CPU= np.array([0.45, 0.72, 1.25, 1.99, 2.32, 2.3]) * 1e4# 1, 2, 4, 8, 16, 32 threads
 
 max_perf = np.maximum(np.max(throughput_FPGA), np.max(throughput_CPU))
 
@@ -45,7 +45,7 @@ ax.text(np.average(x_FPGA), -0.2 * max_perf, 'FPGA (different bank numbers)',
         rotation='horizontal',
         fontsize=tick_label_font)
 
-ax.text(np.average(x_CPU), -0.2 * max_perf, 'CPU (different thread numbers)',
+ax.text(np.average(x_CPU), -0.2 * max_perf, 'CPU (16 channels, different thread numbers)',
         horizontalalignment='center',
         verticalalignment='top',
         rotation='horizontal',
