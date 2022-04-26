@@ -158,32 +158,36 @@ if args.dbname == 'SIFT100M' and args.topK == 1 and args.recall_goal == 0.25:
     optimized_FPGA_throughput = 31033
     ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA Data-dependent', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
     ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'IVF1024'), fontsize=10, horizontalalignment='left', verticalalignment='top')
-    ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='#6C8EBF')
+    ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='black')
 if args.dbname == 'SIFT100M' and args.topK == 1 and args.recall_goal == 0.3:
     optimized_FPGA_throughput = 27709 # 126 MHz
     ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA Data-dependent', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
     ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'IVF4096'), fontsize=10, horizontalalignment='left', verticalalignment='top')
-    ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='#6C8EBF')
+    ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='black')
 elif args.dbname == 'SIFT100M' and args.topK == 10 and args.recall_goal == 0.6:
     optimized_FPGA_throughput = 30965
     ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA Data-dependent', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
     ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'IVF4096'), fontsize=10, horizontalalignment='left', verticalalignment='top')
-    ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='#6C8EBF')
+    ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='black')
 elif args.dbname == 'SIFT100M' and args.topK == 10 and args.recall_goal == 0.8:
     optimized_FPGA_throughput = 11035
     ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA Data-dependent', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
-    ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'OPQ16,IVF8192'), fontsize=10, horizontalalignment='left', verticalalignment='top')
-    ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='#6C8EBF')
+    ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'OPQ + IVF8192'), fontsize=10, horizontalalignment='left', verticalalignment='top')
+    ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='black')
 elif args.dbname == 'SIFT100M' and args.topK == 100 and args.recall_goal == 0.95:
     optimized_FPGA_throughput = 3519
     ax.text(0, optimized_FPGA_throughput * 1.05, 'FPGA Data-dependent', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
-    ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'OPQ16,IVF16384'), fontsize=10, horizontalalignment='left', verticalalignment='top')
-    ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='#6C8EBF')
+    ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'OPQ+  IVF16384'), fontsize=10, horizontalalignment='left', verticalalignment='top')
+    ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='black')
 
 best_qps_cpu = np.amax(y_cpu)
 best_qps_fpga = np.amax(y_fpga)
-print("Speedup over CPU baseline: {:.2f} x".format(optimized_FPGA_throughput / best_qps_cpu))
-print("Speedup over FPGA baseline: {:.2f} x".format(optimized_FPGA_throughput / best_qps_fpga))
+worst_qps_cpu = np.amin([y for y in y_cpu if y != 0])
+worst_qps_fpga = np.amin([y for y in y_fpga if y != 0])
+print("Speedup over CPU best baseline: {:.2f} x".format(optimized_FPGA_throughput / best_qps_cpu))
+print("Speedup over FPGA best baseline: {:.2f} x".format(optimized_FPGA_throughput / best_qps_fpga))
+print("Speedup over CPU worst baseline: {:.2f} x".format(optimized_FPGA_throughput / worst_qps_cpu))
+print("Speedup over FPGA worst baseline: {:.2f} x".format(optimized_FPGA_throughput / worst_qps_fpga))
 
 label_font = 12
 tick_font = 8
