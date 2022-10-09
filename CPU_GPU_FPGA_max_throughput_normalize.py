@@ -185,7 +185,7 @@ if recall_goal_R100 == 0.95:
 
 CPU_FLOPS = 32 * 16 * 2.3 # broadwell 32 op per cycle per core * 16 core * 2.3 GHz
 GPU_FLOPS = 14 * 1000
-FPGA_FLOPS = 9024 / 5 * 2 * (200 * 1e6) * 0.6 / 1e9 
+FPGA_FLOPS = 9024 / 5 * 2 * (140 * 1e6) * 0.6 / 1e9 
 # 9024 DSP 
 # 5 DSP per MAC (2 op) 
 # -> 4500 per cycle * 200 MHz * 60\%
@@ -220,14 +220,18 @@ legend_font = 8
 title_font = 11
 
 # Add some text for labels, title and custom x-axis tick labels, etc.
-ax.set_ylabel('QPS Per Peak Gflop/s', fontsize=label_font)
+ax.set_ylabel('QPS Per Single Gflop/s', fontsize=label_font)
 ax.set_xticks(x)
 ax.set_xticklabels(x_labels)
 plt.xticks(rotation=0)
 
 
-legend_list = ["CPU (16-core Xeon)", "GPU (V100)", "FPGA Data-independent (U280)", "FPGA Data-dependent (U280)"]
-ax.legend([rects_cpu, rects_gpu, rects_fpga, rects_fpga_optimized], legend_list, facecolor='white', framealpha=1, frameon=False, loc=(args.legend_loc_x, 0.4), fontsize=legend_font, ncol=1)
+# legend_list = ["CPU (16-core Xeon)", "GPU (V100)", "FPGA baseline (U280)", "FANNS-generated FPGA (U280)"]
+legend_list = ["CPU", "GPU", "FPGA baseline", "FANNS-generated FPGA"]
+ax.legend([rects_cpu, rects_gpu, rects_fpga, rects_fpga_optimized], legend_list, facecolor='white', framealpha=1, frameon=False, loc=(0.0, 0.8), fontsize=legend_font, ncol=4)
+
+# legend_list = ["CPU (16-core Xeon)", "GPU (V100)", "FPGA Data-independent (U280)", "FPGA Data-dependent (U280)"]
+# ax.legend([rects_cpu, rects_gpu, rects_fpga, rects_fpga_optimized], legend_list, facecolor='white', framealpha=1, frameon=False, loc=(args.legend_loc_x, 0.4), fontsize=legend_font, ncol=1)
 
 # ax.set_title('{} R@{}={}: {:.2f}x over CPU, {:.2f}x over GPU'.format(
 #     dbname, topK, int(recall_goal*100), best_qps_fpga/best_qps_cpu, best_qps_fpga/best_qps_gpu), 

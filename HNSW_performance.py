@@ -20,8 +20,6 @@ x_FPGA_replication = float(0.4) + float(x_FPGA_bank_num[-1]) + np.array([0, 0.2,
 x_CPU = 0.4 + float(x_FPGA_replication[-1]) + np.array([0, 0.2, 0.4, 0.6, 0.8, 1.0]) 
 
 
-########### TODO: Performance of FPGA (2, 4, 8 banks) using ef=128 #############
-########### TODO: Performance of CPU (1~32 threads) using m4.4xlarge #############
 throughput_FPGA_opt = np.array([3650, 4760, 6410]) # 2 banks -> no opt; opt 1 = iter-ovelap; opt 2 = iter-overlap + batching
 throughput_FPGA_bank_num = np.array([6410, 9900, 11100])  # opt 2: 2, 4, 8 banks
 throughput_FPGA_replication = np.array([6250, 12600, 18900, 25300]) # rep opt 1 by 1, 2, 3, 4 times

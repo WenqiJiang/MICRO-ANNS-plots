@@ -140,6 +140,8 @@ max_qps_cpu_R1 = np.max([p[1] for p in performance_tuple_cpu_R1])
 max_qps_gpu_R1 = np.max([p[1] for p in performance_tuple_gpu_R1])
 max_qps_fpga_R1 = np.max([p[1] for p in performance_tuple_fpga_R1])
 
+print("GPU/FPGA R@1: {} x QPS".format(max_qps_gpu_R1/max_qps_fpga_R1))
+
 d_fpga = None
 fpga_baseline_performance_dict_dir = './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_{}.pkl'.format(10)
 with open(fpga_baseline_performance_dict_dir, 'rb') as f:
@@ -152,6 +154,7 @@ max_qps_cpu_R10 = np.max([p[1] for p in performance_tuple_cpu_R10])
 max_qps_gpu_R10 = np.max([p[1] for p in performance_tuple_gpu_R10])
 max_qps_fpga_R10 = np.max([p[1] for p in performance_tuple_fpga_R10])
 
+print("GPU/FPGA R@10: {} x QPS".format(max_qps_gpu_R10/max_qps_fpga_R10))
 
 d_fpga = None
 fpga_baseline_performance_dict_dir = './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_{}.pkl'.format(100)
@@ -168,6 +171,7 @@ max_qps_cpu_R100 = np.max([p[1] for p in performance_tuple_cpu_R100])
 max_qps_gpu_R100 = np.max([p[1] for p in performance_tuple_gpu_R100])
 max_qps_fpga_R100 = np.max([p[1] for p in performance_tuple_fpga_R100])
 
+print("GPU/FPGA R@100: {} x QPS".format(max_qps_gpu_R100/max_qps_fpga_R100))
 
 if recall_goal_R1 == 0.25:
     max_qps_fpga_optimized_R1 = 31033
