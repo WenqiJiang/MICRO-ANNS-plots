@@ -1,10 +1,8 @@
-# Example usaage: 
-#   python CPU_GPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result_m4.4xlarge/cpu_throughput_SIFT100M.pkl' --gpu_performance_dict_dir '../gpu_performance_result_V100_32GB/gpu_throughput_SIFT100M.pkl' --fpga_baseline_performance_dict_dir '../fpga_performance_result/FPGA_perf_dict_SIFT100M.pkl' --dbname SIFT100M --topK 100 --recall_goal 0.95
-
 # Full command list
-#   python CPU_GPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m4.4xlarge.pkl' --gpu_performance_dict_dir './gpu_performance_result/gpu_throughput_SIFT100M_qbs_10000_V100_32GB.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_1.pkl' --dbname SIFT100M --topK 1 --recall_goal 0.3 --legend_loc_x 0.75
-#   python CPU_GPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m4.4xlarge.pkl' --gpu_performance_dict_dir './gpu_performance_result/gpu_throughput_SIFT100M_qbs_10000_V100_32GB.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_10.pkl' --dbname SIFT100M --topK 10 --recall_goal 0.8 --legend_loc_x 0.75
-#   python CPU_GPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m4.4xlarge.pkl' --gpu_performance_dict_dir './gpu_performance_result/gpu_throughput_SIFT100M_qbs_10000_V100_32GB.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_100.pkl' --dbname SIFT100M --topK 100 --recall_goal 0.95 --legend_loc_x 0.0
+#   python CPU_GPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m5.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_1.pkl' --gpu_baseline_performance_dict_dir './gpu_performance_result/gpu_throughput_SIFT100M_qbs_10000_V100_32GB.pkl' --dbname SIFT100M --topK 1 --recall_goal 0.3 --legend_loc_x 0.05
+#   python CPU_GPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m5.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_10.pkl' --gpu_baseline_performance_dict_dir './gpu_performance_result/gpu_throughput_SIFT100M_qbs_10000_V100_32GB.pkl' --dbname SIFT100M --topK 10 --recall_goal 0.8 --legend_loc_x 0.05
+#   python CPU_GPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m5.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_100.pkl' --gpu_baseline_performance_dict_dir './gpu_performance_result/gpu_throughput_SIFT100M_qbs_10000_V100_32GB.pkl' --dbname SIFT100M --topK 100 --recall_goal 0.95 --legend_loc_x 0.05
+#   Deep100M are not measured on GPUs
 
 # Run with python 3.9 if the following error occurs
 # WenqideMacBook-Pro@~/Works/ANNS-FPGA/python_figures wenqi$python CPU_GPU_FPGA_throughput_from_dict.py 
@@ -18,12 +16,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 
+# plt.style.use('grayscale')
+plt.style.use('ggplot')
+
 import argparse 
 parser = argparse.ArgumentParser()
 parser.add_argument('--cpu_performance_dict_dir', type=str, default='../cpu_performance_result_m4.4xlarge/cpu_throughput_SIFT100M.pkl', 
     help="a dictionary of d[dbname][index_key][topK][recall_goal] -> throughput (QPS)")
-parser.add_argument('--gpu_performance_dict_dir', type=str, default='../gpu_performance_result_V100_32GB/gpu_throughput_SIFT100M.pkl', 
-    help="a dictionary of d[dbname][index_key][topK][recall_goal][batch_size] -> throughput (QPS)")
+parser.add_argument('--gpu_baseline_performance_dict_dir', type=str, default='./gpu_performance_result/gpu_throughput_SIFT100M_qbs_10000_V100_32GB.pkl', 
+    help="a dictionary of d[dbname][index_key][topK][recall_goal][qbs] -> throughput (QPS)")
 parser.add_argument('--fpga_baseline_performance_dict_dir', type=str, default='./fpga_performance_result/FPGA_perf_dict_SIFT100M.pkl', 
     help="a dictionary of d[dbname][index_key][topK][recall_goal] -> throughput (QPS)")
 parser.add_argument('--dbname', type=str, default=0, help="dataset name, e.g., SIFT100M")
@@ -35,8 +36,8 @@ parser.add_argument('--legend_loc_x', type=float, default=0.0, help="the x posit
 
 args = parser.parse_args()
 cpu_performance_dict_dir = args.cpu_performance_dict_dir
-gpu_performance_dict_dir = args.gpu_performance_dict_dir
 fpga_baseline_performance_dict_dir = args.fpga_baseline_performance_dict_dir
+gpu_baseline_performance_dict_dir = args.gpu_baseline_performance_dict_dir
 dbname = args.dbname
 topK = args.topK
 recall_goal = args.recall_goal
@@ -64,7 +65,7 @@ def get_cpu_performance_tuple(d, dbname, topK, recall_goal):
     return performance_tuple
 
 
-def get_gpu_performance_tuple(d, dbname, topK, recall_goal):
+def get_gpu_performance_tuple(d, dbname, topK, recall_goal, batch_size):
     """
     d: input dictionary
         d[dbname][index_key][topK][recall_goal] = throughput (QPS)
@@ -114,8 +115,10 @@ def normalize_performance_tuple(performance_tuple, factor):
     return normalized_performance_tuple
 
 def sort_performance_tuple(performance_tuple):
-    order = ['IVF1024', 'IVF2048', 'IVF4096', 'IVF8192', 'IVF16384', 'IVF32768', 'IVF65536', 'IVF131072', 'IVF262144', 'OPQ16,IVF1024', \
-        'OPQ16,IVF2048', 'OPQ16,IVF4096', 'OPQ16,IVF8192', 'OPQ16,IVF16384', 'OPQ16,IVF32768', 'OPQ16,IVF65536', 'OPQ16,IVF131072', 'OPQ16,IVF262144']
+    # order = ['IVF1024', 'IVF2048', 'IVF4096', 'IVF8192', 'IVF16384', 'IVF32768', 'IVF65536', 'IVF131072', 'IVF262144', 'OPQ16,IVF1024', \
+    #     'OPQ16,IVF2048', 'OPQ16,IVF4096', 'OPQ16,IVF8192', 'OPQ16,IVF16384', 'OPQ16,IVF32768', 'OPQ16,IVF65536', 'OPQ16,IVF131072', 'OPQ16,IVF262144']
+    order = ['IVF1024', 'IVF2048', 'IVF4096', 'IVF8192', 'IVF16384', 'IVF32768', 'IVF65536', 'OPQ16,IVF1024', \
+        'OPQ16,IVF2048', 'OPQ16,IVF4096', 'OPQ16,IVF8192', 'OPQ16,IVF16384', 'OPQ16,IVF32768', 'OPQ16,IVF65536']
 
     sorted_performance_tuple = []
 
@@ -135,16 +138,16 @@ def sort_performance_tuple(performance_tuple):
 d_cpu = None
 with open(cpu_performance_dict_dir, 'rb') as f:
     d_cpu = pickle.load(f)
-d_gpu = None
-with open(gpu_performance_dict_dir, 'rb') as f:
-    d_gpu = pickle.load(f)
 d_fpga = None
 with open(fpga_baseline_performance_dict_dir, 'rb') as f:
     d_fpga = pickle.load(f)
+d_gpu = None
+with open(gpu_baseline_performance_dict_dir, 'rb') as f:
+    d_gpu = pickle.load(f)
 
 performance_tuple_cpu = sort_performance_tuple(get_cpu_performance_tuple(d_cpu, dbname, topK, recall_goal))
-performance_tuple_gpu = sort_performance_tuple(get_gpu_performance_tuple(d_gpu, dbname, topK, recall_goal))
 performance_tuple_fpga = sort_performance_tuple(get_fpga_performance_tuple(d_fpga, dbname, topK, recall_goal))
+performance_tuple_gpu = sort_performance_tuple(get_gpu_performance_tuple(d_gpu, dbname, topK, recall_goal, batch_size=10000))
 
 x_labels_cpu = []
 y_cpu = []
@@ -152,85 +155,139 @@ for (idx_name, throughput) in performance_tuple_cpu:
     y_cpu.append(throughput)
     x_labels_cpu.append(idx_name)
 
-x_labels_gpu = []
-y_gpu = []
-for (idx_name, throughput) in performance_tuple_gpu:
-    y_gpu.append(throughput)
-    x_labels_gpu.append(idx_name)
-print(performance_tuple_gpu)
-print(y_gpu)
-
 x_labels_fpga = []
 y_fpga = []
 for (idx_name, throughput) in performance_tuple_fpga:
     y_fpga.append(throughput)
     x_labels_fpga.append(idx_name)
 
-assert x_labels_cpu == x_labels_fpga and \
-    x_labels_cpu == x_labels_gpu 
+x_labels_gpu = []
+y_gpu = []
+for (idx_name, throughput) in performance_tuple_gpu:
+    y_gpu.append(throughput)
+    x_labels_gpu.append(idx_name)
 
-x_labels = x_labels_cpu
+print(y_gpu)
+assert x_labels_cpu == x_labels_fpga and x_labels_cpu == x_labels_gpu
+
+x_labels = []
+for l in x_labels_cpu:
+    if 'OPQ16,' in l:
+        x_labels.append('OPQ+\n' + l[len('OPQ16,'):])
+    else:
+        x_labels.append(l)
+print(x_labels)
 
 x = np.arange(len(x_labels))  # the label locations
-width = 0.3  # the width of the bars
+width = 0.2  # the width of the bars
 
-fig, ax = plt.subplots(1, 1, figsize=(8, 3))
-# 
-rects1  = ax.bar(x - width, y_cpu, width)#, label='Men')
-rects2  = ax.bar(x, y_gpu, width)#, label='Men')
-rects3 = ax.bar(x + width, y_fpga, width)#, label='Women')
+fig, ax = plt.subplots(1, 1, figsize=(10, 2))
+
 
 optimized_FPGA_throughput = None
 if args.dbname == 'SIFT100M' and args.topK == 1 and args.recall_goal == 0.25:
     optimized_FPGA_throughput = 31033
-    ax.text(-1, optimized_FPGA_throughput * 0.95, 'FPGA optimized', fontsize=10, horizontalalignment='left', verticalalignment='top')
-    ax.text(-1, optimized_FPGA_throughput * 1.05, str(optimized_FPGA_throughput), fontsize=10, horizontalalignment='left', verticalalignment='bottom')
-    ax.hlines(y=optimized_FPGA_throughput, xmin=-1, xmax=18, linestyles='dashed', color='#6C8EBF')
-if args.dbname == 'SIFT100M' and args.topK == 1 and args.recall_goal == 0.3:
-    optimized_FPGA_throughput = 31033 ######## WENQI: TODO
-    ax.text(-1, optimized_FPGA_throughput * 0.95, 'FPGA optimized', fontsize=10, horizontalalignment='left', verticalalignment='top')
-    ax.text(-1, optimized_FPGA_throughput * 1.05, str(optimized_FPGA_throughput), fontsize=10, horizontalalignment='left', verticalalignment='bottom')
-    ax.hlines(y=optimized_FPGA_throughput, xmin=-1, xmax=18, linestyles='dashed', color='#6C8EBF')
+    x_labels.insert(0, 'IVF1024')
+    # ax.text(0, optimized_FPGA_throughput * 1.05, 'FANNS-generated FPGA', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
+    # ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'IVF1024'), fontsize=10, horizontalalignment='left', verticalalignment='top')
+    # ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='black')
+elif args.dbname == 'SIFT100M' and args.topK == 1 and args.recall_goal == 0.3:
+    optimized_FPGA_throughput = 27709 # 126 MHz
+    x_labels.insert(0, 'IVF4096')
+    # ax.text(0, optimized_FPGA_throughput * 1.05, 'FANNS-generated FPGA', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
+    # ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'IVF4096'), fontsize=10, horizontalalignment='left', verticalalignment='top')
+    # ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='black')
 elif args.dbname == 'SIFT100M' and args.topK == 10 and args.recall_goal == 0.6:
     optimized_FPGA_throughput = 30965
-    ax.text(-1, optimized_FPGA_throughput * 0.95, 'FPGA optimized', fontsize=10, horizontalalignment='left', verticalalignment='top')
-    ax.text(-1, optimized_FPGA_throughput * 1.05, str(optimized_FPGA_throughput), fontsize=10, horizontalalignment='left', verticalalignment='bottom')
-    ax.hlines(y=optimized_FPGA_throughput, xmin=-1, xmax=18, linestyles='dashed', color='#6C8EBF')
+    x_labels.insert(0, 'IVF4096')
+    # ax.text(0, optimized_FPGA_throughput * 1.05, 'FANNS-generated FPGA', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
+    # ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'IVF4096'), fontsize=10, horizontalalignment='left', verticalalignment='top')
+    # ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='black')
 elif args.dbname == 'SIFT100M' and args.topK == 10 and args.recall_goal == 0.8:
-    optimized_FPGA_throughput = 11098
-    ax.text(-1, optimized_FPGA_throughput * 0.95, 'FPGA optimized', fontsize=10, horizontalalignment='left', verticalalignment='top')
-    ax.text(-1, optimized_FPGA_throughput * 1.05, str(optimized_FPGA_throughput), fontsize=10, horizontalalignment='left', verticalalignment='bottom')
-    ax.hlines(y=optimized_FPGA_throughput, xmin=-1, xmax=18, linestyles='dashed', color='#6C8EBF')
+    optimized_FPGA_throughput = 11035
+    x_labels.insert(0, 'OPQ+\nIVF8192')
+    # ax.text(0, optimized_FPGA_throughput * 1.05, 'FANNS-generated FPGA', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
+    # ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'OPQ + IVF8192'), fontsize=10, horizontalalignment='left', verticalalignment='top')
+    # ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='black')
 elif args.dbname == 'SIFT100M' and args.topK == 100 and args.recall_goal == 0.95:
     optimized_FPGA_throughput = 3519
-    ax.text(-1, optimized_FPGA_throughput * 0.95, 'FPGA optimized', fontsize=10, horizontalalignment='left', verticalalignment='top')
-    ax.text(-1, optimized_FPGA_throughput * 1.05, str(optimized_FPGA_throughput), fontsize=10, horizontalalignment='left', verticalalignment='bottom')
-    ax.hlines(y=optimized_FPGA_throughput, xmin=-1, xmax=18, linestyles='dashed', color='#6C8EBF')
+    x_labels.insert(0, 'OPQ+\nIVF16384')
+    # ax.text(0, optimized_FPGA_throughput * 1.05, 'FANNS-generated FPGA', fontsize=10, horizontalalignment='left', verticalalignment='bottom')
+    # ax.text(0, optimized_FPGA_throughput * 0.95, 'QPS={}, Index={}'.format(optimized_FPGA_throughput, 'OPQ+  IVF16384'), fontsize=10, horizontalalignment='left', verticalalignment='top')
+    # ax.hlines(y=optimized_FPGA_throughput, xmin=-0.5, xmax=13.5, linestyles='solid', color='black')
+elif args.dbname == 'Deep100M' and args.topK == 1 and args.recall_goal == 0.3:
+    optimized_FPGA_throughput = 30658 
+    x_labels.insert(0, 'OPQ+\nIVF4096')
+elif args.dbname == 'Deep100M' and args.topK == 10 and args.recall_goal == 0.7:
+    optimized_FPGA_throughput = 19680
+    x_labels.insert(0, 'OPQ+\nIVF4096')
+elif args.dbname == 'Deep100M' and args.topK == 100 and args.recall_goal == 0.95:
+    optimized_FPGA_throughput = 3589
+    x_labels.insert(0, 'OPQ+\nIVF16384')
+
 
 best_qps_cpu = np.amax(y_cpu)
-best_qps_gpu = np.amax(y_gpu)
 best_qps_fpga = np.amax(y_fpga)
+best_qps_gpu = np.amax(y_gpu)
+worst_qps_cpu = np.amin([y for y in y_cpu if y != 0])
+worst_qps_fpga = np.amin([y for y in y_fpga if y != 0])
+worst_qps_gpu = np.amin([y for y in y_gpu if y != 0])
+print("Speedup over CPU best baseline: {:.2f} x".format(optimized_FPGA_throughput / best_qps_cpu))
+print("Speedup over FPGA best baseline: {:.2f} x".format(optimized_FPGA_throughput / best_qps_fpga))
+print("Speedup over GPU best baseline: {:.2f} x".format(optimized_FPGA_throughput / best_qps_gpu))
+print("Speedup over CPU worst baseline: {:.2f} x".format(optimized_FPGA_throughput / worst_qps_cpu))
+print("Speedup over FPGA worst baseline: {:.2f} x".format(optimized_FPGA_throughput / worst_qps_fpga))
+print("Speedup over GPU worst baseline: {:.2f} x".format(optimized_FPGA_throughput / worst_qps_gpu))
+
+
+# remove the entry where y = 0, to avoid log scale skew
+# for i, y in enumerate(y_cpu): 
+#     if y == 0: 
+#         y_cpu.pop(i)
+#         y_fpga.pop(i)
+#         y_gpu.pop(i)
+
+# # set y = 1 to support log scale
+# for i, y in enumerate(y_cpu): 
+#     if y == 0: 
+#         y_cpu[i] = 1
+# for i, y in enumerate(y_fpga): 
+#     if y == 0: 
+#         y_fpga[i] = 1
+# for i, y in enumerate(y_gpu): 
+#     if y == 0: 
+#         y_gpu[i] = 1
+
+rects_cpu  = ax.bar(x - width, y_cpu, width)#, label='Men')
+rects_fpga = ax.bar(x, y_fpga, width)#, label='Women')
+rects_gpu = ax.bar(x + width, y_gpu, width)#, label='Women')
+
+rects_autogen = ax.bar(-1, optimized_FPGA_throughput, width)
+
 
 label_font = 12
 tick_font = 10
 tick_label_font = 10
 legend_font = 10
-title_font = 14
+title_font = 11
 
 # Add some text for labels, title and custom x-axis tick labels, etc.
 ax.set_ylabel('QPS', fontsize=label_font)
+x = np.array([-1] + list(x))
 ax.set_xticks(x)
-ax.set_xticklabels(x_labels)
-plt.xticks(rotation=70)
+ax.set_xticklabels(x_labels, fontsize=tick_label_font)
+plt.xticks(rotation=90)
 
 
-legend_list = ["CPU (16-core Xeon)", "GPU (1xV100)", "FPGA baseline (1xU280)"]
-ax.legend([rects1, rects2, rects3], legend_list, facecolor='white', framealpha=1, frameon=False, loc=(args.legend_loc_x, 0.7), fontsize=legend_font, ncol=1)
+
+legend_list = ["CD-ANN FPGA", "CPU baseline", "FPGA baseline", "GPU baseline"]
+# legend_list = ["CPU (16-core Xeon)", "FPGA baseline (U280)"]
+ax.legend([rects_autogen, rects_cpu, rects_fpga, rects_gpu], legend_list, facecolor='white', framealpha=1, frameon=False, loc="upper center", fontsize=legend_font, ncol=4)
 
 # ax.set_title('{} R@{}={}: {:.2f}x over CPU, {:.2f}x over GPU'.format(
 #     dbname, topK, int(recall_goal*100), best_qps_fpga/best_qps_cpu, best_qps_fpga/best_qps_gpu), 
 #     fontsize=label_font)
-ax.set_title('{} R@{}={}'.format(dbname, topK, recall_goal), fontsize=label_font)
+ax.set_title('{} R@{}={}'.format(dbname, topK, recall_goal), fontsize=title_font)
 
 def autolabel(rects):
     """Attach a text label above each bar in *rects*, displaying its height."""
@@ -243,16 +300,25 @@ def autolabel(rects):
                     ha='center', va='bottom', fontsize=tick_font, horizontalalignment='left', rotation=90)
 
 
-autolabel(rects1)
-autolabel(rects2)
-autolabel(rects3)
+# autolabel(rects_cpu)
+# autolabel(rects_fpga)
 
-best_qps = np.amax([best_qps_fpga, best_qps_gpu, best_qps_cpu])
-if optimized_FPGA_throughput:
-    best_qps = np.max([best_qps, optimized_FPGA_throughput])
-ax.set(ylim=[0, best_qps * 1.25])
+best_qps = np.amax([best_qps_fpga, best_qps_cpu, best_qps_gpu, optimized_FPGA_throughput])
+print(best_qps_gpu, best_qps)
+# if optimized_FPGA_throughput:
+#     best_qps = np.max([best_qps, optimized_FPGA_throughput])
+# ax.text(-2.5, -0.1 * best_qps, 'Index', fontsize=10, horizontalalignment='center', verticalalignment='top')
+
+
+ax.set(ylim=[1, best_qps * 10])
+ax.set_yscale('log')
 
 plt.rcParams.update({'figure.autolayout': True})
 
-plt.savefig('./CPU_GPU_FPGA_throughput_comparison_fig/{dbname}_R@{topK}={recall}.png'.format(dbname=dbname,topK=topK,recall=int(recall_goal*100)), transparent=False, dpi=200, bbox_inches="tight")
+# for i, y in enumerate(y_cpu):
+#     if y == 1 or y == 0: # 1 -> avoid log 0
+#         ax.text(i + width/2, 0.1, 'cannot reach\nR@{}={}'.format(topK, recall_goal), fontsize=8, horizontalalignment='right', verticalalignment='bottom', rotation=90)
+
+
+plt.savefig('./CPU_GPU_FPGA_throughput_comparison_fig/CPU_GPU_FPGA_throughput_comparison_{dbname}_R@{topK}={recall}.png'.format(dbname=dbname,topK=topK,recall=int(recall_goal*100)), transparent=False, dpi=200, bbox_inches="tight")
 plt.show()

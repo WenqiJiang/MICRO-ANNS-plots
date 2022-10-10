@@ -57,7 +57,9 @@ def draw_resource_consumption_plot(
     for y in y_all:
         assert np.isclose(y, 100)
 
-    plt.style.use('grayscale')
+    # style = 'grayscale'
+    style = 'ggplot'
+    plt.style.use(style)
 
 
     x = np.arange(len(x_labels))  # the label locations
@@ -73,12 +75,20 @@ def draw_resource_consumption_plot(
     bottom_stage_5 = y_stage_4 + bottom_stage_4
     bottom_stage_6 = y_stage_5 + bottom_stage_5
 
-    rects_stage1 = ax.bar(x, y_stage_1, width, bottom=bottom_stage_1, color='#000000')
-    rects_stage2 = ax.bar(x, y_stage_2, width, bottom=bottom_stage_2, color='#222222')
-    rects_stage3 = ax.bar(x, y_stage_3, width, bottom=bottom_stage_3, color='#555555')
-    rects_stage4 = ax.bar(x, y_stage_4, width, bottom=bottom_stage_4, color='#888888')
-    rects_stage5 = ax.bar(x, y_stage_5, width, bottom=bottom_stage_5, color='#AAAAAA')
-    rects_stage6 = ax.bar(x, y_stage_6, width, bottom=bottom_stage_6, color='#CCCCCC')
+    if style == 'grayscale':
+        rects_stage1 = ax.bar(x, y_stage_1, width, bottom=bottom_stage_1, color='#000000')
+        rects_stage2 = ax.bar(x, y_stage_2, width, bottom=bottom_stage_2, color='#222222')
+        rects_stage3 = ax.bar(x, y_stage_3, width, bottom=bottom_stage_3, color='#555555')
+        rects_stage4 = ax.bar(x, y_stage_4, width, bottom=bottom_stage_4, color='#888888')
+        rects_stage5 = ax.bar(x, y_stage_5, width, bottom=bottom_stage_5, color='#AAAAAA')
+        rects_stage6 = ax.bar(x, y_stage_6, width, bottom=bottom_stage_6, color='#CCCCCC')
+    else:
+        rects_stage1 = ax.bar(x, y_stage_1, width, bottom=bottom_stage_1)
+        rects_stage2 = ax.bar(x, y_stage_2, width, bottom=bottom_stage_2)
+        rects_stage3 = ax.bar(x, y_stage_3, width, bottom=bottom_stage_3)
+        rects_stage4 = ax.bar(x, y_stage_4, width, bottom=bottom_stage_4)
+        rects_stage5 = ax.bar(x, y_stage_5, width, bottom=bottom_stage_5)
+        rects_stage6 = ax.bar(x, y_stage_6, width, bottom=bottom_stage_6)
 
 
 
@@ -113,12 +123,21 @@ def draw_resource_consumption_plot(
                             ha='center', va='bottom', fontsize=tick_font, color=color)
 
 
-    number_single_bar(rects_stage1, bottom_stage_1, annotate_threshold=20, color='white')
-    number_single_bar(rects_stage2, bottom_stage_2, annotate_threshold=20, color='white')
-    number_single_bar(rects_stage3, bottom_stage_3, annotate_threshold=20, color='black')
-    number_single_bar(rects_stage4, bottom_stage_4, annotate_threshold=20, color='black')
-    number_single_bar(rects_stage5, bottom_stage_5, annotate_threshold=20, color='black')
-    number_single_bar(rects_stage6, bottom_stage_6, annotate_threshold=20, color='black')
+    if style == 'grayscale':
+        number_single_bar(rects_stage1, bottom_stage_1, annotate_threshold=20, color='white')
+        number_single_bar(rects_stage2, bottom_stage_2, annotate_threshold=20, color='white')
+        number_single_bar(rects_stage3, bottom_stage_3, annotate_threshold=20, color='black')
+        number_single_bar(rects_stage4, bottom_stage_4, annotate_threshold=20, color='black')
+        number_single_bar(rects_stage5, bottom_stage_5, annotate_threshold=20, color='black')
+        number_single_bar(rects_stage6, bottom_stage_6, annotate_threshold=20, color='black')
+    else:
+        color = 'black'
+        number_single_bar(rects_stage1, bottom_stage_1, annotate_threshold=20, color=color)
+        number_single_bar(rects_stage2, bottom_stage_2, annotate_threshold=20, color=color)
+        number_single_bar(rects_stage3, bottom_stage_3, annotate_threshold=20, color=color)
+        number_single_bar(rects_stage4, bottom_stage_4, annotate_threshold=20, color=color)
+        number_single_bar(rects_stage5, bottom_stage_5, annotate_threshold=20, color=color)
+        number_single_bar(rects_stage6, bottom_stage_6, annotate_threshold=20, color=color)
 
     ax.set_title(title, fontsize=title_font, y=1.35)
 

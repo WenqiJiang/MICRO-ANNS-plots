@@ -5,9 +5,9 @@
 #   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m5.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_1.pkl' --dbname SIFT100M --topK 1 --recall_goal 0.3 --legend_loc_x 0.05
 #   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m5.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_10.pkl' --dbname SIFT100M --topK 10 --recall_goal 0.8 --legend_loc_x 0.05
 #   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m5.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_SIFT100M_K_100.pkl' --dbname SIFT100M --topK 100 --recall_goal 0.95 --legend_loc_x 0.05
-#   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m5.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_Deep100M_K_1.pkl' --dbname Deep100M --topK 1 --recall_goal 0.3 --legend_loc_x 0.05
-#   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m5.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_Deep100M_K_10.pkl' --dbname Deep100M --topK 10 --recall_goal 0.7 --legend_loc_x 0.05
-#   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_SIFT100M_qbs_10000_m5.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_Deep100M_K_100.pkl' --dbname Deep100M --topK 100 --recall_goal 0.95 --legend_loc_x 0.05
+#   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_Deep100M_qbs_10000_m5.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_Deep100M_K_1.pkl' --dbname Deep100M --topK 1 --recall_goal 0.3 --legend_loc_x 0.05
+#   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_Deep100M_qbs_10000_m5.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_Deep100M_K_10.pkl' --dbname Deep100M --topK 10 --recall_goal 0.7 --legend_loc_x 0.05
+#   python CPU_FPGA_throughput_from_dict.py --cpu_performance_dict_dir './cpu_performance_result/cpu_throughput_Deep100M_qbs_10000_m5.4xlarge.pkl' --fpga_baseline_performance_dict_dir './fpga_performance_result/FPGA_perf_dict_Deep100M_K_100.pkl' --dbname Deep100M --topK 100 --recall_goal 0.95 --legend_loc_x 0.05
 
 # Run with python 3.9 if the following error occurs
 # WenqideMacBook-Pro@~/Works/ANNS-FPGA/python_figures wenqi$python CPU_GPU_FPGA_throughput_from_dict.py 
@@ -53,7 +53,6 @@ def get_cpu_performance_tuple(d, dbname, topK, recall_goal):
         d[dbname][index_key][topK][recall_goal] = throughput (QPS)
     return the performance tuple (index_key, QPS) of certain topK and recall_goal
     """
-    print(d)
     performance_tuple = []
     for index_key in d[dbname]:
         if index_key[:len("OPQ16,IMI")] == "OPQ16,IMI":
